@@ -1,6 +1,20 @@
+import 'package:axis/core%20/routing/navigation_services.dart';
+import 'package:axis/core%20/services/local/simple_bloc_observer.dart';
+import 'package:axis/core%20/theme/text_style.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-void main() {
+import 'core /services/service_locator.dart/service_locator.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await configureInjection();
+
+  if (kDebugMode) {
+    Bloc.observer = SimpleBlocObserver();
+  }
   runApp(const MyApp());
 }
 
@@ -9,14 +23,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,  
-      title: 'Currency Exchange',
-      theme: ThemeData(
-      
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+    return ScreenUtilInit(
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        navigatorKey: NavigationService.navigatorKey,
+          theme: ThemeData(
+          fontFamily: AppTextStyle.fontFamily,
+          useMaterial3: true,
+        ),
+        title: 'Currency Exchange',
+        home: const HomePage(),
       ),
-      home: const HomePage(),
     );
   }
 }
@@ -27,12 +47,8 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home Page'),
-      ),
-      body: const Center(
-        child: Text('Welcome to the Home Page!'),
-      ),
+      appBar: AppBar(title: const Text('Home Page')),
+      body: const Center(child: Text('Welcome to the Home Page!')),
     );
   }
 }

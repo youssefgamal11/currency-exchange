@@ -14,7 +14,30 @@ dependencies:
     sdk: flutter
 
  
+  #UI
+  flutter_screenutil: ^5.9.3
+  flutter_svg: ^2.3.0
   cupertino_icons: ^1.0.8
+  lottie: ^3.3.1
+
+
+  #Logic
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+  get_it: ^9.2.1
+  injectable: ^2.5.0
+
+
+
+  #Networking
+  dio: ^5.9.2
+  pretty_dio_logger: ^1.4.0
+
+
+  #local storage
+  shared_preferences: ^2.5.5
+
+  
 
 dev_dependencies:
   flutter_test:
