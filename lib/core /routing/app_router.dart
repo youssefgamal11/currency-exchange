@@ -1,7 +1,11 @@
 import 'package:axis/features/onBoarding/presenation/pages/onBoarding_page.dart';
-import 'package:axis/features/exchange_rate_list/presentation/pages/exchange_rate_list_page.dart';
+import 'package:axis/features/exchange_rates/presentation/bloc/exchange_rate_bloc.dart';
+import 'package:axis/features/exchange_rates/presentation/bloc/exchange_rate_events.dart';
+import 'package:axis/features/exchange_rates/presentation/pages/exchange_rates_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../services/service_locator.dart/service_locator.dart';
 import 'route_name.dart';
 
 
@@ -17,8 +21,10 @@ class AppRouter {
 
       case RouteName.exchangeRateList:
         return MaterialPageRoute(
-          builder: (_) =>
-           const ExchangeRateListPage(),
+          builder: (_) => BlocProvider(
+            create: (_) => sl<ExchangeRateBloc>()..add(const GetExchangeRateEvent()),
+            child: const ExchangeRateListPage(),
+          ),
         );
 
       default:

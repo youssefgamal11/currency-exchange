@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         ),
         title: 'Currency Exchange',
         onGenerateRoute: AppRouter.allRoutes,
-        initialRoute: RouteName.exchangeRateList,
+        initialRoute: RouteName.onBoarding,
       ),
     );
   }

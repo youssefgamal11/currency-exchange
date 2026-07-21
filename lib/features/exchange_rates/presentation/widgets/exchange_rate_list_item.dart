@@ -4,19 +4,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:axis/core%20/theme/colors.dart';
 import 'package:axis/core%20/theme/text_style.dart';
-import 'package:axis/features/_shared/widgets/mini_sparkline.dart';
 
-import '../models/exchange_rate.dart';
+import '../models/exchange_rate_view_data.dart';
 
 class ExchangeRateListItem extends StatelessWidget {
   const ExchangeRateListItem({super.key, required this.item});
 
-  final ExchangeRate item;
+  final ExchangeRateViewData item;
 
   @override
   Widget build(BuildContext context) {
-    final color = item.isPositive ? AppColors.good : AppColors.critical;
-
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
@@ -44,7 +41,6 @@ class ExchangeRateListItem extends StatelessWidget {
               ),
             ),
           ),
-     
           SizedBox(width: 12.w),
           Expanded(
             child: Column(
@@ -55,12 +51,6 @@ class ExchangeRateListItem extends StatelessWidget {
                 Text(item.name, style: AppTextStyle.m12),
               ],
             ),
-          ),
-          MiniSparkline(
-            points: item.sparklinePoints,
-            color: color,
-            width: 44.w,
-            height: 20.h,
           ),
           SizedBox(width: 12.w),
           Column(
@@ -79,13 +69,11 @@ class ExchangeRateListItem extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    item.isPositive ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                    size: 12.sp,
-                    color: color,
-                  ),
-                  SizedBox(width: 2.w),
-                  Text(item.changeLabel, style: AppTextStyle.r11.copyWith(color: color)),
+                  if (item.arrow != null) ...[
+                    Icon(item.arrow, size: 12.sp, color: item.color),
+                    SizedBox(width: 2.w),
+                  ],
+                  Text(item.changeLabel, style: AppTextStyle.r11.copyWith(color: item.color)),
                 ],
               ),
             ],
