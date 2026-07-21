@@ -27,16 +27,25 @@ class ExchangeRateViewData {
     required this.name,
     required this.flagAsset,
     required this.rate,
-    required this.changeLabel,
+    required this.changeAbsolute,
+    required this.changePercent,
+    required this.trend,
     required this.color,
   });
 
   final String code;
   final String name;
   final String flagAsset;
-  final String rate;
-  final String changeLabel;
+  final double rate;
+  final double changeAbsolute;
+  final double changePercent;
+  final RateTrend trend;
   final Color color;
+
+  String get rateLabel => rate.toStringAsFixed(2);
+
+  String get changeLabel => '${changeAbsolute.abs().toStringAsFixed(2)} EGP '
+      '(${changePercent.abs().toStringAsFixed(2)}%)';
 
   factory ExchangeRateViewData.fromChange(CurrencyRateChange change) {
     final meta = _currencyMeta[change.code]!;
@@ -45,16 +54,15 @@ class ExchangeRateViewData {
       RateTrend.weakening => AppColors.critical,
       RateTrend.unchanged => AppColors.textTertiary,
     };
-    final absChange = change.changeAbsolute.abs();
-    final absPercent = change.changePercent.abs();
 
     return ExchangeRateViewData(
       code: change.code,
       name: meta.name,
       flagAsset: meta.flagAsset,
-      rate: change.rate.toStringAsFixed(2),
-      changeLabel: '${absChange.toStringAsFixed(2)} EGP '
-          '(${absPercent.toStringAsFixed(2)}%)',
+      rate: change.rate,
+      changeAbsolute: change.changeAbsolute,
+      changePercent: change.changePercent,
+      trend: change.trend,
       color: color,
     );
   }

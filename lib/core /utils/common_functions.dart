@@ -12,4 +12,13 @@ class CommonFunctions {
     final day = date.day.toString().padLeft(2, '0');
     return '${date.year}-$month-$day';
   }
+
+  static const _shortMonths = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  static String formatShortDate(DateTime date) {
+    return '${_shortMonths[date.month - 1]} ${date.day}';
+  }
 }

@@ -12,16 +12,18 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../../features/currency_detail/presentation/bloc/currency_detail_bloc.dart'
+    as _i525;
 import '../../../features/exchange_rates/data/data_source/exchange_rates_remote_data_source.dart'
-    as _i824;
+    as _i644;
 import '../../../features/exchange_rates/data/repository_impl/exchange_rates_repository_impl.dart'
-    as _i49;
+    as _i954;
 import '../../../features/exchange_rates/domain/repository/exchange_rates_repository.dart'
-    as _i388;
+    as _i502;
 import '../../../features/exchange_rates/domain/use_cases/get_exchange_rates_use_case.dart'
-    as _i576;
+    as _i12;
 import '../../../features/exchange_rates/presentation/bloc/exchange_rates_bloc.dart'
-    as _i1049;
+    as _i383;
 import '../network/dio_impl.dart' as _i856;
 import '../network/network_helper.dart' as _i369;
 
@@ -33,23 +35,26 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     gh.lazySingleton<_i369.NetworkHelper>(() => _i856.DioImpl());
-    gh.factory<_i824.ExchangeRateRemoteDataSource>(
-      () => _i824.ExchangeRateRemoteDataSourceImpl(
+    gh.factory<_i644.ExchangeRateRemoteDataSource>(
+      () => _i644.ExchangeRateRemoteDataSourceImpl(
         networkHelper: gh<_i369.NetworkHelper>(),
       ),
     );
-    gh.factory<_i388.ExchangeRateRepository>(
-      () => _i49.ExchangeRateRepositoryImpl(
-        exchangeRateRemoteDataSource: gh<_i824.ExchangeRateRemoteDataSource>(),
+    gh.factory<_i502.ExchangeRateRepository>(
+      () => _i954.ExchangeRateRepositoryImpl(
+        exchangeRateRemoteDataSource: gh<_i644.ExchangeRateRemoteDataSource>(),
       ),
     );
-    gh.factory<_i576.GetExchangeRatesUseCase>(
-      () => _i576.GetExchangeRatesUseCase(
-        exchangeRateRepository: gh<_i388.ExchangeRateRepository>(),
+    gh.factory<_i12.GetExchangeRatesUseCase>(
+      () => _i12.GetExchangeRatesUseCase(
+        exchangeRateRepository: gh<_i502.ExchangeRateRepository>(),
       ),
     );
-    gh.factory<_i1049.ExchangeRateBloc>(
-      () => _i1049.ExchangeRateBloc(gh<_i576.GetExchangeRatesUseCase>()),
+    gh.factory<_i525.CurrencyDetailBloc>(
+      () => _i525.CurrencyDetailBloc(gh<_i12.GetExchangeRatesUseCase>()),
+    );
+    gh.factory<_i383.ExchangeRateBloc>(
+      () => _i383.ExchangeRateBloc(gh<_i12.GetExchangeRatesUseCase>()),
     );
     return this;
   }
