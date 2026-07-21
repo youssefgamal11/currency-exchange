@@ -1,22 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:axis/core%20/enums/bloc_status.dart';
+import '../../domain/entity/currency_rate_change.dart';
 import '../../domain/use_cases/get_exchange_rates_use_case.dart';
-import '../models/exchange_rate_view_data.dart';
-import 'exchange_rate_events.dart';
-import 'exchange_rate_states.dart';
+import '../models/exchange_rates_view_data.dart';
+import 'exchange_rates_events.dart';
+import 'exchange_rates_states.dart';
 
 @injectable
 class ExchangeRateBloc extends Bloc<ExchangeRateEvents, ExchangeRateStates> {
   ExchangeRateBloc(this.getExchangeRatesUseCase)
     : super(const ExchangeRateStates()) {
-    on<GetExchangeRateEvent>(getExchangeRateList);
+    on<GetExchangeRatesEvent>(getExchangeRateList);
   }
 
   final GetExchangeRatesUseCase getExchangeRatesUseCase;
 
   Future<void> getExchangeRateList(
-    GetExchangeRateEvent event,
+    GetExchangeRatesEvent event,
     Emitter<ExchangeRateStates> emit,
   ) async {
     emit(state.copyWith(status: BlocStatus.loading));
@@ -32,7 +33,10 @@ class ExchangeRateBloc extends Bloc<ExchangeRateEvents, ExchangeRateStates> {
 
     final combined = latestResult.flatMap(
       (latest) => previousResult.map(
-        (previous) => ExchangeRateViewData.build(latest: latest, previous: previous),
+        (previous) => CurrencyRateChange.fromResponses(
+          latest: latest,
+          previous: previous,
+        ).map(ExchangeRateViewData.fromChange).toList(),
       ),
     );
 

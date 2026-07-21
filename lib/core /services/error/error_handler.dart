@@ -60,39 +60,34 @@ extension DataSourceExtension on ResponseType {
   Failure getFailure() {
     switch (this) {
       case ResponseType.noContent:
-        return Failure(
-            StatusCode.noContent, "formatException"); // not used
+        return Failure(StatusCode.noContent, "No data was returned by the server");
       case ResponseType.badRequest:
-        return Failure(
-            StatusCode.badRequest, "formatException"); // not used
+        return Failure(StatusCode.badRequest, "Invalid request, please check your input");
       case ResponseType.forbidden:
-        return Failure(StatusCode.forbidden, "formatException"); //not used
+        return Failure(StatusCode.forbidden, "You don't have permission to access this resource");
       case ResponseType.unauthorised:
-        return Failure(StatusCode.unAuthorised, "unAuthorized");
+        return Failure(StatusCode.unAuthorised, "Session expired, please log in again");
       case ResponseType.notFound:
-        return Failure(StatusCode.notFound, "formatException");
+        return Failure(StatusCode.notFound, "The requested resource was not found");
       case ResponseType.internalServerError:
-        return Failure(
-            StatusCode.internalServerError, "formatException"); // not used
+        return Failure(StatusCode.internalServerError, "Something went wrong on our end, please try again later");
       case ResponseType.serviceUnavailable:
       case ResponseType.serviceUnavailable2:
-        return Failure(
-            StatusCode.serviceUnavailable, "serviceUnavailable");
+        return Failure(StatusCode.serviceUnavailable, "Service is currently unavailable, please try again later");
       case ResponseType.connectTimeout:
-        return Failure(StatusCode.connectTimeout, "httpException");
+        return Failure(StatusCode.connectTimeout, "Connection timed out, please check your internet connection");
       case ResponseType.cancel:
-        return Failure(StatusCode.cancel, "httpException");
+        return Failure(StatusCode.cancel, "Request was cancelled");
       case ResponseType.receiveTimeout:
-        return Failure(StatusCode.receiveTimeout, "socketException");
+        return Failure(StatusCode.receiveTimeout, "Server took too long to respond, please try again");
       case ResponseType.sendTimeout:
-        return Failure(StatusCode.sendTimeout, "socketException");
+        return Failure(StatusCode.sendTimeout, "Request took too long to send, please try again");
       case ResponseType.cacheError:
-        return Failure(
-            StatusCode.cacheError, "formatException"); // not used
+        return Failure(StatusCode.cacheError, "Failed to load cached data");
       case ResponseType.noInternetConnection:
-        return Failure(StatusCode.noInternetConnection, "socketException");
+        return Failure(StatusCode.noInternetConnection, "No internet connection, please check your network");
       case ResponseType.defaultError:
-        return Failure(StatusCode.defaultError, "httpException");
+        return Failure(StatusCode.defaultError, "An unexpected error occurred, please try again");
     }
   }
 }

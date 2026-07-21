@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../bloc/exchange_rate_bloc.dart';
-import '../bloc/exchange_rate_events.dart';
-import '../bloc/exchange_rate_states.dart';
-import 'exchange_rate_list_empty.dart';
-import 'exchange_rate_list_error.dart';
-import 'exchange_rate_list_item.dart';
-import 'exchange_rate_list_loading.dart';
+import '../bloc/exchange_rates_bloc.dart';
+import '../bloc/exchange_rates_events.dart';
+import '../bloc/exchange_rates_states.dart';
+import 'exchange_rates_list_empty.dart';
+import 'exchange_rates_list_error.dart';
+import 'exchange_rates_list_item.dart';
+import 'exchange_rates_list_loading.dart';
 
 class ExchangeRateListWidget extends StatelessWidget {
   const ExchangeRateListWidget({super.key});
@@ -25,7 +25,7 @@ class ExchangeRateListWidget extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: () async =>
-                context.read<ExchangeRateBloc>().add(const GetExchangeRateEvent()),
+                context.read<ExchangeRateBloc>().add(const GetExchangeRatesEvent()),
             child: ListView.separated(
               itemBuilder: (context, index) {
                 return ExchangeRateListItem(item: state.exchangeRateList[index]);
@@ -40,7 +40,7 @@ class ExchangeRateListWidget extends StatelessWidget {
           return ExchangeRateListError(
             message: state.errorMessage ?? 'Something went wrong',
             onRetry: () =>
-                context.read<ExchangeRateBloc>().add(const GetExchangeRateEvent()),
+                context.read<ExchangeRateBloc>().add(const GetExchangeRatesEvent()),
           );
         } else {
           return const ExchangeRateListLoading();

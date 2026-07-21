@@ -12,15 +12,15 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
-import '../../../features/exchange_rates/data/data_source/remote_data_source.dart'
+import '../../../features/exchange_rates/data/data_source/exchange_rates_remote_data_source.dart'
     as _i824;
-import '../../../features/exchange_rates/data/repository_impl/repository_impl.dart'
+import '../../../features/exchange_rates/data/repository_impl/exchange_rates_repository_impl.dart'
     as _i49;
-import '../../../features/exchange_rates/domain/repository/repository.dart'
+import '../../../features/exchange_rates/domain/repository/exchange_rates_repository.dart'
     as _i388;
 import '../../../features/exchange_rates/domain/use_cases/get_exchange_rates_use_case.dart'
     as _i576;
-import '../../../features/exchange_rates/presentation/bloc/exchange_rate_bloc.dart'
+import '../../../features/exchange_rates/presentation/bloc/exchange_rates_bloc.dart'
     as _i1049;
 import '../network/dio_impl.dart' as _i856;
 import '../network/network_helper.dart' as _i369;

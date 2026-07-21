@@ -7,8 +7,8 @@ sealed class ExchangeRateEvents extends Equatable {
   List<Object?> get props => [];
 }
 
-class GetExchangeRateEvent extends ExchangeRateEvents {
-  const GetExchangeRateEvent();
+class GetExchangeRatesEvent extends ExchangeRateEvents {
+  const GetExchangeRatesEvent();
 }
 
 

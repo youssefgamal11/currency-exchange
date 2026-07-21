@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:axis/core%20/theme/colors.dart';
-import '../bloc/exchange_rate_bloc.dart';
-import '../bloc/exchange_rate_events.dart';
+import '../bloc/exchange_rates_bloc.dart';
+import '../bloc/exchange_rates_events.dart';
 import '../widgets/base_currency_selector.dart';
-import '../widgets/exchange_rate_header.dart';
-import '../widgets/exchange_rate_list_body.dart';
+import '../widgets/exchange_rates_header.dart';
+import '../widgets/exchange_rates_list_body.dart';
 import '../widgets/update_status_row.dart';
 
 class ExchangeRateListPage extends StatelessWidget {
@@ -25,7 +25,7 @@ class ExchangeRateListPage extends StatelessWidget {
             children: [
               ExchangeRateHeader(
                 onRefresh: () => context.read<ExchangeRateBloc>().add(
-                  const GetExchangeRateEvent(),
+                  const GetExchangeRatesEvent(),
                 ),
               ),
               SizedBox(height: 12.h),

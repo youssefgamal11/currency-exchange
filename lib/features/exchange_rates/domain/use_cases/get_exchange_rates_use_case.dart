@@ -1,7 +1,7 @@
-import 'package:axis/features/exchange_rates/domain/repository/repository.dart';
+import 'package:axis/features/exchange_rates/domain/repository/exchange_rates_repository.dart';
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
-import '../entity/exchange_rate_response_entity.dart';
+import '../entity/exchange_rates_response_entity.dart';
 
 @injectable
 class GetExchangeRatesUseCase {

@@ -1,3 +1,4 @@
+import 'package:axis/core%20/routing/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -40,7 +41,9 @@ class OnboardingPage extends StatelessWidget {
               SizedBox(height: 24.h),
               CurrencyFlagRow(),
               SizedBox(height: 35.h),
-              PrimaryButton(label: 'Start Tracking Rates', onPressed: () {}),
+              PrimaryButton(label: 'Start Tracking Rates', onPressed: () {
+Navigator.pushNamed(context, RouteName.exchangeRateList);
+              }),
               SizedBox(height: 8.h),
             ],
           ),

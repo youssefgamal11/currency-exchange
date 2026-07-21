@@ -7,6 +7,7 @@ import 'package:axis/core%20/theme/text_style.dart';
 
 import '../models/exchange_rates_view_data.dart';
 
+
 class ExchangeRateListItem extends StatelessWidget {
   const ExchangeRateListItem({super.key, required this.item});
 

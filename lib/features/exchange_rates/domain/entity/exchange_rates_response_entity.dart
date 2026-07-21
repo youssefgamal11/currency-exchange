@@ -13,4 +13,13 @@ class EgpRatesEntity {
   double? jpy;
 
   EgpRatesEntity({this.usd, this.eur, this.gbp, this.sar, this.jpy});
+
+  double? operator [](String code) => switch (code) {
+        'USD' => usd,
+        'EUR' => eur,
+        'GBP' => gbp,
+        'SAR' => sar,
+        'JPY' => jpy,
+        _ => null,
+      };
 }

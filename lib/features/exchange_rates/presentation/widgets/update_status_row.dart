@@ -6,8 +6,8 @@ import 'package:axis/core%20/theme/colors.dart';
 import 'package:axis/core%20/theme/text_style.dart';
 import 'package:axis/core%20/utils/common_functions.dart';
 
-import '../bloc/exchange_rate_bloc.dart';
-import '../bloc/exchange_rate_states.dart';
+import '../bloc/exchange_rates_bloc.dart';
+import '../bloc/exchange_rates_states.dart';
 
 class UpdateStatusRow extends StatelessWidget {
   const UpdateStatusRow({super.key});

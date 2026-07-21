@@ -3,7 +3,7 @@ import 'package:axis/core%20/utils/common_functions.dart';
 import 'package:axis/core%20/utils/end_points.dart';
 import 'package:injectable/injectable.dart';
 
-import '../models/exchange_rate_response_model.dart';
+import '../models/exchange_rates_response_model.dart';
 
 abstract class ExchangeRateRemoteDataSource {
   Future<ExchangeRateResponseModel> getExchangeRates(DateTime? dateTime);

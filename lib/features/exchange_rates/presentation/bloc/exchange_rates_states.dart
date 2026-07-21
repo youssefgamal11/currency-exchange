@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import 'package:axis/core%20/enums/bloc_status.dart';
 
-import '../models/exchange_rate_view_data.dart';
+import '../models/exchange_rates_view_data.dart';
 
 class ExchangeRateStates extends Equatable {
   const ExchangeRateStates({

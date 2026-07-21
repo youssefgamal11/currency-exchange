@@ -1,4 +1,4 @@
-import '../../domain/entity/exchange_rate_response_entity.dart';
+import '../../domain/entity/exchange_rates_response_entity.dart';
 
 class ExchangeRateResponseModel extends ExchangeRateResponseEntity {
   ExchangeRateResponseModel.fromJson(Map<String, dynamic> json) {

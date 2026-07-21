@@ -3,6 +3,7 @@ import 'package:axis/core%20/services/local/simple_bloc_observer.dart';
 import 'package:axis/core%20/theme/text_style.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'core /routing/app_router.dart';
@@ -11,8 +12,11 @@ import 'core /services/service_locator.dart/service_locator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await configureInjection();
-
   if (kDebugMode) {
     Bloc.observer = SimpleBlocObserver();
   }
@@ -31,7 +35,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         navigatorKey: NavigationService.navigatorKey,
-          theme: ThemeData(
+        theme: ThemeData(
           fontFamily: AppTextStyle.fontFamily,
           useMaterial3: true,
         ),
@@ -42,5 +46,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
