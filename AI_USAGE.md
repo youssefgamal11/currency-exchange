@@ -16,7 +16,13 @@ Every meaningful prompt gets an entry with:
 - **Decision** — Accepted / Edited / Rejected
 - **Why** — the actual reasoning for that call
 
+Entries are grouped below by feature/area — expand a section to see its entries. Entry
+numbers are global (not per-section) so cross-references between entries still resolve.
 
+
+
+<details>
+<summary><strong>Design Foundations</strong> — cross-screen visual direction (Entries 1–2)</summary>
 
 ---
 
@@ -64,6 +70,13 @@ chips.
 
 **Why:** Matching a concrete, approved reference beats iterating on an original concept — closed
 each named gap directly rather than re-guessing at the whole design again.
+
+---
+
+</details>
+
+<details>
+<summary><strong>Onboarding Screen</strong> (Entries 3–9)</summary>
 
 ---
 
@@ -213,4 +226,125 @@ correct implementation, executed directly.
 **Why:** No judgment call needed beyond picking the standard Flutter pattern for gradient fills
 on an `ElevatedButton`, which was worth a brief internal note but not a design decision to weigh.
 
-<!-- Add new entries above this line as the project progresses. -->
+---
+
+</details>
+
+<details>
+<summary><strong>Exchange Rate List</strong> (Entries 10–13)</summary>
+
+---
+
+## Entry 10 — 2026-07-21
+
+*(Entries 10–12 reconstructed from commit history/diffs and `exchange_rate_list.md`, not
+from a live transcript — see note below.)*
+
+**Prompt (reconstructed):** Asked Claude to build the Exchange Rate List screen's UI, same
+scope discipline as onboarding — design-token-driven layout, hardcoded mock data, no Bloc,
+no real navigation wiring, using the approved reference screenshot (header + refresh
+button, "live" status dot, EGP base-currency selector pill, scrollable list of rate cards
+with flag/code/name, sparkline, rate, and colored daily-change line).
+
+**Model returned:** `exchange_rate_list/presentation/` with `models/exchange_rate.dart`
+(mock `ExchangeRate` data class), `exchange_rate_header.dart`, `update_status_row.dart`,
+`base_currency_selector.dart`, `exchange_rate_list_item.dart`, and
+`exchange_rate_list_page.dart` wiring them together with a hardcoded 5-currency list
+(USD/EUR/GBP/SAR/JPY). Promoted `MiniSparkline` out of the onboarding feature into
+`lib/features/_shared/widgets/` since both screens needed the same trend-line painter.
+Registered `RouteName.exchangeRateList` without wiring anything to navigate to it yet
+(commits `72d6116`, `27d68e5`).
+
+**Decision:** Accepted.
+
+**Why:** Reused the onboarding pattern deliberately (design tokens, mock data, no state
+management yet) to keep the UI and data-wiring concerns separate — matches Entry 3's
+reasoning for not mixing design decisions with implementation ones.
+
+---
+
+## Entry 11 — 2026-07-21
+
+**Prompt (reconstructed):** Asked Claude to plan and implement "Module 1" — wiring the
+Exchange Rate List screen to the real currency-rates API
+(`latest.currency-api.pages.dev`), restructuring the feature into clean
+architecture (`data`/`domain`/`presentation`) matching the rest of the app, as a real
+`flutter_bloc` feature with loading/error/empty states and pull-to-refresh.
+
+**Model returned:** Rewrote `exchange_rate_list.md` from a UI-only doc into a full API-
+integration plan (API reference table, EGP-per-unit inversion math, the
+strengthening-is-green/weakening-is-red color semantics, folder structure, DI wiring
+notes), then implemented it: `core/enums/bloc_status.dart` (shared `BlocStatus` enum
+instead of a bespoke per-feature status), `ApiUrls.currencyApiLatestEgp`/
+`currencyApiHistoricalEgp` in `end_points.dart`, `CommonFunctions.formatTime`/`formatDate`,
+domain entities/repository contract/use case (two `Either`-returning repository calls
+combined via `dartz`'s `flatMap`/`map`, no try/catch outside the repository impl), the
+`ExchangeRateBloc`/events/states, and new `exchange_rate_list_loading.dart`/
+`exchange_rate_list_error.dart`/`exchange_rate_list_empty.dart` state widgets — dropping
+`MiniSparkline` from the real list item since the API only gives 2 data points (today +
+yesterday), not enough for a meaningful trend line.
+
+**Decision:** Accepted.
+
+**Why:** Documenting the API's inverted-quote convention and the (counter-intuitive)
+color/arrow semantics in the plan doc *before* implementing avoided the "which way is
+green" mistake being made silently in code — matches the project's practice of writing a
+design/implementation spec before touching Flutter code (Entry 1, Entry 3).
+
+---
+
+## Entry 12 — 2026-07-22
+
+**Prompt (reconstructed):** Asked Claude to refactor the feature: rename `exchange_rate`
+→ `exchange_rates` consistently (folder, files, classes) to match the plural feature name
+used elsewhere, and address rough edges — proper error messages instead of placeholder
+strings, a real loading skeleton instead of a spinner, and lock the app to portrait since
+the UI wasn't designed for landscape.
+
+**Model returned:** Renamed the feature folder and its data/domain/presentation files to
+the `exchange_rates_*` convention; extracted the rate/change math out of
+`ExchangeRateViewData.build()` into a standalone `CurrencyRateChange` domain value object
+(`CurrencyRateChange.fromQuotes`/`fromResponses`, `RateTrend` enum) so the presentation
+layer's `ExchangeRateViewData.fromChange()` only formats, it doesn't compute; replaced the
+loading widget's bare `CircularProgressIndicator` with a `shimmer`-based skeleton list
+matching the real item's layout; locked `AndroidManifest.xml`
+(`android:screenOrientation="portrait"`) and `Info.plist`
+(`UISupportedInterfaceOrientations`) to portrait-only.
+
+**Decision:** Accepted, with one leftover flagged: the rename left both
+`exchange_rate_list_item.dart` (old singular name, unused) and
+`exchange_rates_list_item.dart` (new plural name, actually imported) present in
+`widgets/` — worth deleting the dead duplicate in a follow-up pass.
+
+**Why:** Consistent plural naming across the feature avoids the kind of singular/plural
+drift that already needed a cleanup pass here; centralizing the rate/change math in one
+domain object (rather than duplicating the inversion/color logic in the view-data class)
+keeps `ExchangeRateViewData` a pure formatter, matching the "no formatting/business logic
+mixed together" rule from the original plan (Entry 11).
+
+---
+
+## Entry 13 — 2026-07-22
+
+**Prompt:** "formant this part wiht meaningful message for each error extension
+DataSourceExtension on ResponseType {...}" — pasted the `getFailure()` switch statement,
+whose cases mostly returned placeholder strings (`"formatException"`, `"httpException"`,
+`"socketException"`) unrelated to the actual case, several marked `// not used`.
+
+**Model returned:** Replaced every placeholder string with a specific, user-facing message
+for that case (e.g. `noContent` → "No data was returned by the server", `unauthorised` →
+"Session expired, please log in again", `serviceUnavailable`/`serviceUnavailable2` →
+"Service is currently unavailable, please try again later"), and reformatted each `case` to
+a single-line `return` for consistency.
+
+**Decision:** Accepted.
+
+**Why:** The original strings were copy-pasted exception-type names rather than messages,
+so they gave the wrong `Failure.message` for cases like `noContent`/`badRequest` — direct,
+unambiguous fix with no design tradeoff to weigh.
+
+---
+
+</details>
+
+<!-- Add new sections/entries above this line as the project progresses. -->
