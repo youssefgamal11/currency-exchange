@@ -226,16 +226,6 @@ the entry point during this pass.
 2. `flutter pub get`.
 3. `flutter analyze` — clean run expected against `flutter_lints: ^6.0.0`; watch for deprecated
    `withOpacity` (use `withValues(alpha:)` instead) and unused-import warnings.
-4. `flutter run` on a simulator, with `home: const OnboardingPage()` wired:
-   - Dark background renders correctly; check status bar icon visibility isn't broken by the dark
-     theme (may need `SystemChrome.setSystemUIOverlayStyle` if icons render invisible).
-   - Hero chips don't overlap the center badge or each other, at the design size and on one
-     smaller simulator (e.g. iPhone SE ~375×667) to confirm scrolling kicks in correctly.
-   - Headline renders with "true value," in amber, rest white.
-   - Feature pills wrap to 2 rows.
-   - All 6 flags render as real flag graphics (this is the actual test that the supplied SVGs are
-     wired correctly).
-   - CTA button renders with gradient fill and rounded corners, responds to tap (no-op).
 
 ### Critical files
 - `lib/core /theme/colors.dart`

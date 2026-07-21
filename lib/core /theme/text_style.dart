@@ -7,6 +7,8 @@ class AppTextStyle {
   static const fontFamily = 'Inter';
 
   static TextStyle r10 = TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w400, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1);
+  static TextStyle r11 = TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w400, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1);
+  static TextStyle r12 = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1.3);
 
   static TextStyle m12 = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500, fontFamily: fontFamily, color: AppColors.textSecondary, height: 1.3);
 
@@ -15,6 +17,7 @@ class AppTextStyle {
   static TextStyle b10 = TextStyle(fontSize: 10.sp, fontWeight: FontWeight.w700, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1);
 
   static TextStyle b11 = TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w700, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1);
+  static TextStyle b12 = TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w700, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1);
 
   static TextStyle b14 = TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w700, fontFamily: fontFamily, color: AppColors.textPrimary, height: 1);
 

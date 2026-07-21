@@ -44,4 +44,173 @@ and correct axis values matter for a data-accuracy-sensitive app like this one. 
 of the corrected direction and handed them to Claude Code to turn into a full design-spec
 artifact (all required states: loading, error, empty, offline) before writing any Flutter code.
 
+---
+
+## Entry 2 — 2026-07-21
+
+**Prompt:** Attached UI design reference screenshots (onboarding/marketing screen, exchange
+rates list, currency detail) to Claude and asked for the app's visual design to match them — a
+single onboarding screen plus all required states for the other two screens.
+
+**Model returned:** An interactive HTML mockup published as an Artifact: onboarding (amber/mint-
+green/coral palette, floating rate chips, flag icons, inline sparklines), the Exchange Rates
+List, and the Currency Detail screen, covering every required state (loading, error, empty,
+offline).
+
+**Decision:** Edited, over a couple of rounds. Closed specific gaps against the reference each
+time: the detail screen's page title, the "rate is inverted from the API" info banner,
+inconsistent gold coloring on rate numbers, and the onboarding hero having only 2 of 4 floating
+chips.
+
+**Why:** Matching a concrete, approved reference beats iterating on an original concept — closed
+each named gap directly rather than re-guessing at the whole design again.
+
+---
+
+## Entry 3 — 2026-07-21
+
+**Prompt:** Asked Claude (in plan mode) to design the onboarding screen's implementation —
+extracting colors into `AppColors`, fonts/text styles into `AppTextStyle`, and flag SVGs, before
+writing any screen code.
+
+**Model returned:** Explored the existing stub files (`AppColors` had one placeholder color,
+`AppTextStyle` referenced fonts that didn't exist, `ImgPath` pointed at a missing SVG, no
+`assets/` folder existed at all), then a full plan: palette + type scale extracted from the
+approved mockup, and three open decisions — font sourcing (`google_fonts` vs. self-provided
+files), flag sourcing (a flag-icon package vs. self-provided SVGs), and whether to keep the
+existing terse text-style naming convention (`eb16`, `b11`) vs. switch to semantic names.
+
+**Decision:** Edited. Chose to supply the actual Inter `.ttf` files and flag SVGs directly rather
+than add `google_fonts` or a flag package dependency; kept the terse naming convention.
+
+**Why:** Bundling real font/flag files locally keeps the app fully offline from first launch —
+`google_fonts`'s default runtime-fetch-and-cache behavior would have meant a cold, offline first
+launch could silently fall back to the system font, which is a real tension for an app whose
+headline feature is offline support. Keeping the existing naming convention avoided introducing a
+second style before a second real screen existed to justify it.
+
+---
+
+## Entry 4 — 2026-07-21
+
+**Prompt:** Supplied the Inter font files and asked Claude to pick the most-useful weights (even
+for future screens) and wire them into the project; later supplied the flag SVGs and asked to
+wire their paths.
+
+**Model returned:** Copied Inter's 18pt static instance (Regular/Medium/SemiBold/Bold/ExtraBold)
+into `assets/fonts/`, wrote the full `AppColors` palette and `AppTextStyle` type scale, wired
+`pubspec.yaml`'s `fonts:` block, then later wrote `ImgPath` flag constants and the `assets:`
+entry once the SVGs landed in `assets/icons/flags/`.
+
+**Decision:** Accepted, with one gap caught proactively: the Egypt flag (`eg`/`egy.svg`) was
+initially missing since only the 5 target-currency flags had been supplied — flagged before
+writing any code that referenced it, rather than shipping a broken asset reference.
+
+**Why:** Verified via `flutter pub get`/`flutter analyze` after each step rather than batching
+everything then debugging at the end.
+
+---
+
+## Entry 5 — 2026-07-21
+
+**Prompt:** Asked Claude to implement the onboarding screen (step 6 of the plan), but with
+constraints: separate widgets in a `widgets/` folder, not private classes, and fewer separate
+widgets overall — treating "flag + name + amount" as one reusable item fed different data rather
+than one bespoke widget per currency.
+
+**Model returned:** Public widget files (`BrandLockup`, `CurrencyRateChip`, `OnboardingHero`,
+`OnboardingHeadline`, `FeaturePillsRow`, `CurrencyFlagRow`, `PrimaryCtaButton`), with
+`CurrencyRateChip` as the one reusable "chip" fed different flag/code/rate data 4 times in the
+hero instead of 4 near-identical widgets.
+
+**Decision:** Accepted. During visual verification (ran the app on an iOS simulator, screenshotted
+it) caught a real layout bug — the hero's `Stack` had no explicit width, so it collapsed to fit
+only the center badge and all 4 chips bunched up overlapping instead of reaching the corners.
+Fixed with `width: double.infinity` on the hero's `SizedBox`, rebuilt, reconfirmed clean.
+
+**Why:** The consolidation request matches good Flutter practice (data-driven widgets over
+copy-pasted near-duplicates); the width bug was exactly the kind of thing that only surfaces by
+actually running the app, not by reading the code, which is why it's part of the normal
+verification loop here rather than skipped.
+
+---
+
+## Entry 6 — 2026-07-21
+
+**Prompt:** Provided a screenshot and asked to refactor `OnboardingHero` to match it — a mini
+rates-list preview card with the 4 floating chips overlapping its corners/edges, instead of an
+isolated center badge in empty space.
+
+**Model returned:** Rebuilt the hero as a preview card (EGP header + 5 `MiniCurrencyRow` entries,
+a new shared row widget) with the 4 chips positioned to peek over its edges via small negative
+offsets — extracted a shared `MiniSparkline` widget so the sparkline painter wasn't duplicated
+between the chip and the new row widget.
+
+**Decision:** Edited/reverted. Verified against the screenshot (chips do partially cover a couple
+of row labels, same as the reference) and flagged that legibility tradeoff explicitly rather than
+silently shipping it. The hero was later reverted back to the simpler center-badge version
+directly in the editor, ahead of the next redesign request (Entry 7).
+
+**Why:** Matching the reference took priority over the usual instinct to "fix" the overlap-on-text
+issue this time, but it was still worth naming the tradeoff out loud rather than assuming it was
+fine.
+
+---
+
+## Entry 7 — 2026-07-21
+
+**Prompt:** Provided a screenshot and asked to make `CurrencyRateChip` match its design — a
+horizontal layout (flag+code left, sparkline middle, rate+change right) instead of the original
+vertical chip.
+
+**Model returned:** Rebuilt `CurrencyRateChip` to wrap the existing `MiniCurrencyRow` content
+inside chip-style decoration, reusing the row layout instead of duplicating it. Verification (ran
+the app, screenshotted) caught a 1.4px `RenderFlex` overflow inside the narrower chip width.
+
+**Decision:** Accepted, with the overflow fixed by trimming internal gap/sparkline sizes (saved
+~8px of width, comfortably clearing the 1.4px overflow) rather than widening the chip past what
+the hero's corner-positioning math could safely fit.
+
+**Why:** Reusing `MiniCurrencyRow` instead of re-implementing the row layout a second time avoided
+a second place for that logic to drift out of sync.
+
+---
+
+## Entry 8 — 2026-07-21
+
+**Prompt:** "make OnboardingHero a container that have colum of nb..." — message was cut off
+mid-send. Claude asked what the column should contain rather than guessing; the answer was "a
+column of five currencies."
+
+**Model returned:** Replaced the floating/rotated `Stack` layout with a plain `Container` wrapping
+a `Column` of all 5 `CurrencyRateChip`s (adding EUR, which previously had no floating chip),
+full-width, no rotation.
+
+**Decision:** Accepted. Simplified `CurrencyRateChip` itself in the same pass — dropped the now-
+unused `rotation` parameter and fixed narrow width, since the chip's only remaining use case was
+this full-width column.
+
+**Why:** Asked for clarification instead of guessing at the cut-off instruction, since "column of
+nb" was genuinely ambiguous and guessing wrong would have meant redoing real layout work.
+
+---
+
+## Entry 9 — 2026-07-21
+
+**Prompt:** Asked to make the rate value's "=" prefix white while the rate number itself stays
+accent-colored, using rich text; separately, asked to rename `PrimaryCtaButton` to `PrimaryButton`
+and rebuild it using Flutter's `ElevatedButton`.
+
+**Model returned:** Changed the plain colored `Text` to `Text.rich`/`TextSpan` so only the rate
+value inherits the accent color while `"= "` inherits the base white style. Renamed the button
+file/class and rebuilt it on `ElevatedButton` using the `Ink` + gradient pattern (since
+`ElevatedButton.backgroundColor` doesn't support gradients directly), preserving the amber
+gradient fill.
+
+**Decision:** Accepted as specified — both were precise, unambiguous instructions with a single
+correct implementation, executed directly.
+
+**Why:** No judgment call needed beyond picking the standard Flutter pattern for gradient fills
+on an `ElevatedButton`, which was worth a brief internal note but not a design decision to weigh.
+
 <!-- Add new entries above this line as the project progresses. -->
