@@ -1,11 +1,10 @@
+import 'package:axis/features/_shared/widgets/mini_sparkline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
 import 'package:axis/core%20/theme/colors.dart';
 import 'package:axis/core%20/theme/text_style.dart';
 
-import 'mini_sparkline.dart';
 
 class MiniCurrencyRow extends StatelessWidget {
   const MiniCurrencyRow({
