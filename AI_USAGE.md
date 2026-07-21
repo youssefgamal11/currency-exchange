@@ -347,4 +347,109 @@ unambiguous fix with no design tradeoff to weigh.
 
 </details>
 
+<details>
+<summary><strong>Currency Detail</strong> (Entries 14–19)</summary>
+
+---
+
+## Entry 14 — 2026-07-22
+
+**Prompt:** "currency details feature will use the same usecase of exchange rate, so should i
+use it directly from exchange rates or are there any alternatives"
+
+**Model returned:** Recommended calling the existing `GetExchangeRatesUseCase` directly from
+the new `CurrencyDetailBloc` rather than introducing a new repository/data source/use-case
+wrapper. Laid out the alternatives and why they're worse: reusing the repository directly
+skips the domain boundary, reusing the data source reaches into another feature's internals,
+and duplicating the network call causes divergence — whereas the use case is the correct,
+intended sharing boundary. Noted this matches the `currency_detail.md` plan (no `data/` layer
+of its own; only the 7-day chart needs fetching) and the as-built `ExchangeRateBloc`
+precedent, which already combines its own multi-call fetch inside the bloc.
+
+**Decision:** Accepted.
+
+**Why:** Of all the ways to reuse the data path, sharing at the use-case layer is the one that
+respects Clean Architecture's dependency direction — better than duplicating logic or reaching
+past the domain boundary into another feature's data layer.
+
+---
+
+## Entry 15 — 2026-07-22
+
+**Prompt:** "continue Architecture / folder structure for currency details" — asked to
+implement the folder structure laid out in the `currency_detail.md` plan doc.
+
+**Model returned:** Built the full `currency_detail/` feature per the plan:
+`presentation/bloc/currency_detail_bloc.dart` (fires 7 calls via `Future.wait` — 6 historical
+days + one `null`/latest call so the newest point matches the header's current rate exactly —
+folds the `Either` results into a list with first-failure-short-circuits, inverts each raw
+`egp[code]` quote via `1 / raw`, skips null/zero days, emits `List<CurrencyHistoryPoint>`);
+the page (`StatelessWidget` rendering the top section straight from nav args, no bloc
+dependency); and widgets `currency_detail_header`, `current_rate_card`, `stat_card` +
+`stat_card_grid` (one data-driven tile fed 4×), `currency_history_chart_card` (owns its
+`BlocBuilder` and the loading/error/success branching), `currency_history_chart` (`fl_chart`
+`LineChart` with `minY`/`maxY` computed from the actual fetched range, line colored by
+`weekTrend`), `currency_history_chart_loading` (shimmer, not a spinner),
+`currency_history_chart_error`, and `inverted_rate_info_banner`. Wired
+`RouteName.currencyDetail` in `app_router.dart` (extracting `CurrencyDetailArgs`, dispatching
+`GetCurrencyHistoryEvent`) and hand-added `CurrencyDetailBloc` to the manually maintained
+`service_locator.config.dart`, depending only on the already-registered
+`GetExchangeRatesUseCase`.
+
+**Decision:** Accepted. Verified with `flutter analyze` (no new issues) and
+`flutter build apk --debug` (built clean).
+
+**Why:** Followed the pre-written plan doc rather than improvising, matching the project's
+practice of speccing before coding (Entries 3, 11); the shimmer loading and computed axis
+range are direct carry-overs of decisions already made for the list screen (Entry 12) and the
+mockup's broken axis labels (Entry 1).
+
+---
+
+
+## Entry 17 — 2026-07-22
+
+**Prompt:** "why did we make factory CurrencyDetailArgs.fromViewData... i think we don't need
+it and access the data directly from constructor"
+
+**Model returned:** Agreed and removed the `fromViewData` factory, mapping the fields inline at
+the single call site in `exchange_rates_list_item.dart` (which already holds the
+`ExchangeRateViewData` item and imports both types). Removing the factory also dropped the
+`ExchangeRateViewData` import from `CurrencyDetailArgs`, leaving it a plain data holder whose
+only dependency is the `RateTrend` domain enum.
+
+**Decision:** Accepted.
+
+**Why:** The factory had one caller (YAGNI) and was the sole thing coupling the args class to a
+presentation view model — removing it both cut indirection and finished the layering cleanup
+started in Entry 16.
+
+---
+
+
+## Entry 18 — 2026-07-22
+
+**Prompt:** "i changed the model to opus to ask =>does my current arch is a good approach as i used the usecase from exchange rate
+feature directly"
+
+**Model returned:** Reviewed the architecture (no code change). Assessed reusing
+`GetExchangeRatesUseCase` directly as the correct sharing boundary, but flagged the real
+weakness as *where the logic lives* — the 7-call orchestration, `1/raw` inversion, and
+null/zero filtering sit in the bloc rather than a domain object, unlike the list feature's
+`CurrencyRateChange`. Noted this is nonetheless consistent with the as-built `ExchangeRateBloc`
+(which also combines its fetch inline), and named the cross-feature coupling on
+`exchange_rates`' entities as the trade-off. Suggested — as optional, not required — extracting
+a `GetCurrencyHistoryUseCase` into `currency_detail/domain/` to move that logic out of the
+bloc.
+
+**Decision:** Accepted the current approach; extraction left as an optional follow-up.
+
+**Why:** For a two-screen app, matching the existing inline-combine precedent has more value
+than a purer-but-inconsistent wrapper; surfaced the honest trade-off rather than either
+rubber-stamping or over-engineering it.
+
+---
+
+</details>
+
 <!-- Add new sections/entries above this line as the project progresses. -->
