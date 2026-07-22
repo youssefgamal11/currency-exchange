@@ -58,6 +58,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i954.ExchangeRateRepositoryImpl(
         exchangeRateRemoteDataSource: gh<_i644.ExchangeRateRemoteDataSource>(),
         exchangeRateLocalDataSource: gh<_i921.ExchangeRateLocalDataSource>(),
+        connectivityService: gh<_i528.ConnectivityService>(),
       ),
     );
     gh.factory<_i12.GetExchangeRatesUseCase>(

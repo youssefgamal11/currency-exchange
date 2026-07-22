@@ -452,4 +452,89 @@ rubber-stamping or over-engineering it.
 
 </details>
 
+<details>
+<summary><strong>Offline Caching &amp; Polish</strong> (Entries 19–21)</summary>
+
+---
+
+## Entry 19 — 2026-07-22
+
+*(Entries 19–21 reconstructed from commit history/diffs and `offline_cache.md`, not from a
+live transcript — same convention as Entries 10–12.)*
+
+**Prompt (reconstructed):** Asked Claude to plan and implement "Module 3" — the offline caching
+layer that makes the app's headline offline feature real: persist the last fetched rates locally,
+serve them when the network is down, show when the data was last updated, and auto-refresh when
+connectivity returns. Same spec-before-code discipline as the earlier modules.
+
+**Model returned:** Wrote `offline_cache.md` (requirements→approach table, data-flow states, the
+"cache lives in the repository, not the bloc" rule) then implemented it: a Hive-backed
+`ExchangeRateLocalDataSource` with **write-through** on every successful fetch and **read-through**
+fallback on failure, wired into `ExchangeRateRepositoryImpl` as the single insertion point so
+neither bloc knows about Hive. Added an `ExchangeRatesResult` domain wrapper ({data, timestamp,
+isFromCache}) so the bloc can surface the *real* fetch time instead of blindly setting
+`lastUpdated = DateTime.now()`. Added a `ConnectivityService` (`connectivity_plus`) that both blocs
+subscribe to — a `ConnectivityChangedEvent` flips an `isOffline` flag and re-dispatches the fetch
+on an offline→online transition. Surfaced offline state in the UI: `UpdateStatusRow`'s dot goes
+amber with "Offline · Updated &lt;time&gt;", and a new `DetailOfflineIndicator` shows on the detail
+screen. Because both screens share `GetExchangeRatesUseCase`, caching at the repository
+transparently made the 7-day chart work offline too.
+
+**Decision:** Accepted.
+
+**Why:** Two deliberate calls stand out. Caching at the repository (not the bloc) keeps data
+concerns in the data layer and gets the detail chart's offline support "for free" via the shared
+use case (Entry 14). Serializing the response model as a `jsonEncode`d String envelope instead of
+`hive_generator`/`TypeAdapter`s sidesteps both Hive's dynamic-map read typing *and* this repo's
+non-working build_runner pipeline — a pragmatic fit for the project's hand-maintained DI
+(`service_locator.config.dart`).
+
+---
+
+## Entry 20 — 2026-07-22
+
+**Prompt (reconstructed):** Asked Claude to extend the same offline behavior to the currency-detail
+history and tidy up the caching bootstrap, plus a round of small UI polish on how rate direction is
+shown.
+
+**Model returned:** Added a `CurrencyHistoryLocalDataSource` and a `HiveStorage` helper that
+centralizes box names and opening (`exchange_rates_cache`, `currency_history_cache`, `app_settings`)
+behind one `HiveStorage.init()`, replacing the inline `Hive.openBox` calls in `main.dart`; the
+`app_settings` box also persists an `onboarding_seen` flag. UI polish: replaced the textual `+`/`-`
+sign convention on the detail screen's Daily Change / Change % stat cards and the list item's change
+label with a directional **trend arrow** (`arrow_upward`/`arrow_downward`, none when unchanged) plus
+the absolute value — a new `icon` parameter on `StatCard` and a `trendIcon` getter on
+`ExchangeRateViewData`, both driven off the existing `RateTrend` enum.
+
+**Decision:** Accepted.
+
+**Why:** Centralizing box management in `HiveStorage` keeps the growing set of caches (and the new
+settings box) out of `main.dart` as more of them appear. The trend-arrow treatment reuses the
+`RateTrend` enum that already drives the color semantics (Entry 11) rather than re-deriving
+direction from the sign of the number, keeping a single source of truth for "which way did it move".
+
+---
+
+## Entry 21 — 2026-07-22
+
+**Prompt (reconstructed):** Refined the repository's offline path — guard the request so it never
+fires while offline, and remove the duplicated read-through fallback.
+
+**Model returned:** Added an early `connectivityService.isConnected()` check at the top of
+`getExchangeRates` that short-circuits to cache (with a "No internet connection" message on a miss)
+before touching the network, so a known-offline call doesn't wait on a doomed request/timeout. Folded
+the two identical cache-fallback blocks (the offline guard and the `catch`) into one `_cachedOr`
+helper returning `Right(cache, cachedAt, isFromCache: true)` on a hit and `Left(message)` on a miss.
+
+**Decision:** Accepted (working-tree change, not yet committed at time of writing).
+
+**Why:** The original code only served cache *after* a failed request; checking connectivity up front
+avoids a pointless network attempt when we already know we're offline, and extracting `_cachedOr`
+removes the copy-pasted fallback so the read-through logic lives in one place — the same
+consolidation instinct applied to the view-data/domain math in Entry 12.
+
+---
+
+</details>
+
 <!-- Add new sections/entries above this line as the project progresses. -->

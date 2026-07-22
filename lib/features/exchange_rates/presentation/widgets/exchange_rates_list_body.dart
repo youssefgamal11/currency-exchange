@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:axis/core%20/theme/colors.dart';
+
 import '../bloc/exchange_rates_bloc.dart';
 import '../bloc/exchange_rates_events.dart';
 import '../bloc/exchange_rates_states.dart';
@@ -24,6 +26,7 @@ class ExchangeRateListWidget extends StatelessWidget {
           }
 
           return RefreshIndicator(
+            color: AppColors.accent,
             onRefresh: () async =>
                 context.read<ExchangeRateBloc>().add(const GetExchangeRatesEvent()),
             child: ListView.separated(
