@@ -1,5 +1,5 @@
 class RouteName {
   static const onBoarding = '/onBoarding';
-  static const exchangeRateList = '/exchangeRateList';
+  static const exchangeRateListPage = '/exchangeRateListPage';
   static const currencyDetail = '/currencyDetail';
 }

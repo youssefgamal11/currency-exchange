@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         title: 'Currency Exchange',
         onGenerateRoute: AppRouter.allRoutes,
         initialRoute: HiveStorage.hasSeenOnboarding
-            ? RouteName.exchangeRateList
+            ? RouteName.exchangeRateListPage
             : RouteName.onBoarding,
       ),
     );

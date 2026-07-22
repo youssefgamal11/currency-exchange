@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import '../../utils/end_points.dart';
 import 'interceptors.dart';
 import 'network_helper.dart';
 
@@ -54,7 +53,7 @@ class DioImpl implements NetworkHelper {
     Function(int? count, int? total)? onReceiveProgress,
   }) async {
     final response = await _dio.get(
-      isFullPath ? path : "${ApiUrls.apiVersion}$path",
+      path,
       queryParameters: queryParams,
       data: formData ?? body,
       cancelToken: cancelToken,
@@ -79,7 +78,7 @@ class DioImpl implements NetworkHelper {
   }) async {
   
     final response = await _dio.post(
-      isFullPath ? path : "${ApiUrls.apiVersion}$path",
+      path,
       data: formData ?? body,
       queryParameters: queryParams,
       cancelToken: cancelToken,

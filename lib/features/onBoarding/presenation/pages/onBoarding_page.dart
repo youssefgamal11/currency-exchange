@@ -47,7 +47,7 @@ class OnboardingPage extends StatelessWidget {
                 if (!context.mounted) return;
                 Navigator.pushReplacementNamed(
                   context,
-                  RouteName.exchangeRateList,
+                  RouteName.exchangeRateListPage,
                 );
               }),
               SizedBox(height: 8.h),

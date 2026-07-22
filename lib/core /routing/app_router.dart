@@ -23,7 +23,7 @@ class AppRouter {
            const OnboardingPage(),
         );
 
-      case RouteName.exchangeRateList:
+      case RouteName.exchangeRateListPage:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => sl<ExchangeRateBloc>()..add(const GetExchangeRatesEvent()),
