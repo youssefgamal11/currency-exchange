@@ -47,6 +47,12 @@ class ExchangeRateViewData {
   String get changeLabel => '${changeAbsolute.abs().toStringAsFixed(2)} EGP '
       '(${changePercent.abs().toStringAsFixed(2)}%)';
 
+  IconData? get trendIcon => switch (trend) {
+    RateTrend.strengthening => Icons.arrow_upward,
+    RateTrend.weakening => Icons.arrow_downward,
+    RateTrend.unchanged => null,
+  };
+
   factory ExchangeRateViewData.fromChange(CurrencyRateChange change) {
     final meta = _currencyMeta[change.code]!;
     final color = switch (change.trend) {

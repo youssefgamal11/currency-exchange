@@ -7,18 +7,22 @@ import 'package:axis/core%20/enums/bloc_status.dart';
 import 'package:axis/core%20/services/connectivity/connectivity_service.dart';
 import '../../../exchange_rates/domain/entity/exchange_rates_response_entity.dart';
 import '../../../exchange_rates/domain/use_cases/get_exchange_rates_use_case.dart';
+import '../../data/data_source/currency_history_local_data_source.dart';
 import '../../domain/entity/currency_history_point.dart';
 import 'currency_detail_events.dart';
 import 'currency_detail_states.dart';
 
 @injectable
 class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates> {
-  CurrencyDetailBloc(this.getExchangeRatesUseCase, this.connectivityService)
-    : super(const CurrencyDetailStates()) {
+  CurrencyDetailBloc(
+    this.getExchangeRatesUseCase,
+    this.connectivityService,
+    this.historyLocalDataSource,
+  ) : super(const CurrencyDetailStates()) {
     on<GetCurrencyHistoryEvent>(getCurrencyHistory);
-    on<ConnectivityChangedEvent>(_onConnectivityChanged);
+    on<ConnectivityChangedEvent>(onConnectivityChanged);
 
-    _connectivitySub = connectivityService.onStatusChange.listen(
+    connectivitySub = connectivityService.onStatusChange.listen(
       (isOnline) => add(ConnectivityChangedEvent(isOnline)),
     );
     connectivityService.isConnected().then(
@@ -28,7 +32,8 @@ class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates
 
   final GetExchangeRatesUseCase getExchangeRatesUseCase;
   final ConnectivityService connectivityService;
-  StreamSubscription<bool>? _connectivitySub;
+  final CurrencyHistoryLocalDataSource historyLocalDataSource;
+  StreamSubscription<bool>? connectivitySub;
   String? _lastCode;
 
   Future<void> getCurrencyHistory(
@@ -59,6 +64,11 @@ class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates
     }
 
     if (error != null) {
+      final cached = historyLocalDataSource.getCachedHistory(event.code);
+      if (cached != null && cached.isNotEmpty) {
+        emit(state.copyWith(status: BlocStatus.success, history: cached));
+        return;
+      }
       emit(state.copyWith(status: BlocStatus.failure, errorMessage: error));
       return;
     }
@@ -72,17 +82,20 @@ class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates
       );
     }
 
+    if (!state.isOffline) {
+      await historyLocalDataSource.cacheHistory(event.code, history);
+    }
+
     emit(state.copyWith(status: BlocStatus.success, history: history));
   }
 
-  void _onConnectivityChanged(
+  void onConnectivityChanged(
     ConnectivityChangedEvent event,
     Emitter<CurrencyDetailStates> emit,
   ) {
     final wasOffline = state.isOffline;
     emit(state.copyWith(isOffline: !event.isOnline));
 
-    // Auto-refresh the history when connectivity returns.
     if (wasOffline && event.isOnline && _lastCode != null) {
       add(GetCurrencyHistoryEvent(code: _lastCode!));
     }
@@ -90,7 +103,7 @@ class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates
 
   @override
   Future<void> close() {
-    _connectivitySub?.cancel();
+    connectivitySub?.cancel();
     return super.close();
   }
 }

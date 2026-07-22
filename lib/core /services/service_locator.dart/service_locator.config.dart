@@ -12,6 +12,8 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../../features/currency_detail/data/data_source/currency_history_local_data_source.dart'
+    as _i654;
 import '../../../features/currency_detail/presentation/bloc/currency_detail_bloc.dart'
     as _i525;
 import '../../../features/exchange_rates/data/data_source/exchange_rates_local_data_source.dart'
@@ -44,6 +46,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i921.ExchangeRateLocalDataSourceImpl(),
     );
     gh.lazySingleton<_i369.NetworkHelper>(() => _i856.DioImpl());
+    gh.factory<_i654.CurrencyHistoryLocalDataSource>(
+      () => _i654.CurrencyHistoryLocalDataSourceImpl(),
+    );
     gh.factory<_i644.ExchangeRateRemoteDataSource>(
       () => _i644.ExchangeRateRemoteDataSourceImpl(
         networkHelper: gh<_i369.NetworkHelper>(),
@@ -64,6 +69,7 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i525.CurrencyDetailBloc(
         gh<_i12.GetExchangeRatesUseCase>(),
         gh<_i528.ConnectivityService>(),
+        gh<_i654.CurrencyHistoryLocalDataSource>(),
       ),
     );
     gh.factory<_i383.ExchangeRateBloc>(

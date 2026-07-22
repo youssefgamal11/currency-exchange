@@ -28,7 +28,7 @@ class DetailOfflineIndicator extends StatelessWidget {
                 decoration: const BoxDecoration(color: AppColors.accent, shape: BoxShape.circle),
               ),
               SizedBox(width: 6.w),
-              Text('Offline · showing cached data', style: AppTextStyle.m12),
+              Text('Offline .', style: AppTextStyle.m12),
             ],
           ),
         );

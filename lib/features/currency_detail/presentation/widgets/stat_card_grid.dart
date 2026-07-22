@@ -21,6 +21,12 @@ class StatCardGrid extends StatelessWidget {
       RateTrend.unchanged => AppColors.textTertiary,
     };
 
+    final trendIcon = switch (args.trend) {
+      RateTrend.strengthening => Icons.arrow_upward,
+      RateTrend.weakening => Icons.arrow_downward,
+      RateTrend.unchanged => null,
+    };
+
     final updatedLabel = args.lastUpdated == null
         ? '—'
         : 
@@ -36,13 +42,15 @@ class StatCardGrid extends StatelessWidget {
       children: [
         StatCard(
           label: 'Daily Change',
-          value: '${args.changeAbsolute >= 0 ? '+' : ''}${args.changeAbsolute.toStringAsFixed(2)}',
+          value: args.changeAbsolute.abs().toStringAsFixed(2),
           valueColor: changeColor,
+          icon: trendIcon,
         ),
         StatCard(
           label: 'Change %',
-          value: '${args.changePercent >= 0 ? '+' : ''}${args.changePercent.toStringAsFixed(2)}%',
+          value: '${args.changePercent.abs().toStringAsFixed(2)}%',
           valueColor: changeColor,
+          icon: trendIcon,
         ),
         StatCard(label: 'Yesterday', value: args.yesterdayRate.toStringAsFixed(2)),
         StatCard(label: 'Last Update', value: updatedLabel),

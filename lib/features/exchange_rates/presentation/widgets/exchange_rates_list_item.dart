@@ -89,7 +89,19 @@ class ExchangeRateListItem extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 6.h),
-                Text(item.changeLabel, style: AppTextStyle.r11.copyWith(color: item.color)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (item.trendIcon != null) ...[
+                      Icon(item.trendIcon, size: 12.sp, color: item.color),
+                      SizedBox(width: 3.w),
+                    ],
+                    Text(
+                      item.changeLabel,
+                      style: AppTextStyle.r11.copyWith(color: item.color),
+                    ),
+                  ],
+                ),
               ],
             ),
             SizedBox(width: 6.w),

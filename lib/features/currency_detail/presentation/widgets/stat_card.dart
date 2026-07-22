@@ -5,14 +5,22 @@ import 'package:axis/core%20/theme/colors.dart';
 import 'package:axis/core%20/theme/text_style.dart';
 
 class StatCard extends StatelessWidget {
-  const StatCard({super.key, required this.label, required this.value, this.valueColor});
+  const StatCard({
+    super.key,
+    required this.label,
+    required this.value,
+    this.valueColor,
+    this.icon,
+  });
 
   final String label;
   final String value;
   final Color? valueColor;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
+    final color = valueColor ?? AppColors.textPrimary;
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
@@ -25,7 +33,15 @@ class StatCard extends StatelessWidget {
         children: [
           Text(label, style: AppTextStyle.m12),
           SizedBox(height: 6.h),
-          Text(value, style: AppTextStyle.b15.copyWith(color: valueColor ?? AppColors.textPrimary)),
+          Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 16.sp, color: color),
+                SizedBox(width: 4.w),
+              ],
+              Text(value, style: AppTextStyle.b15.copyWith(color: color)),
+            ],
+          ),
         ],
       ),
     );

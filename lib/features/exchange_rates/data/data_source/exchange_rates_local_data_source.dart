@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:axis/core%20/storage/hive_storage.dart';
 import 'package:axis/core%20/utils/common_functions.dart';
 import 'package:hive/hive.dart';
 import 'package:injectable/injectable.dart';
@@ -7,10 +8,6 @@ import 'package:injectable/injectable.dart';
 import '../../domain/entity/exchange_rates_response_entity.dart';
 import '../models/exchange_rates_response_model.dart';
 
-/// Name of the Hive box opened in `main.dart` during bootstrap.
-const kExchangeRatesCacheBox = 'exchange_rates_cache';
-
-/// A cached response together with the time it was originally fetched.
 class CachedExchangeRates {
   const CachedExchangeRates({required this.data, required this.cachedAt});
 
@@ -29,10 +26,8 @@ abstract class ExchangeRateLocalDataSource {
 
 @Injectable(as: ExchangeRateLocalDataSource)
 class ExchangeRateLocalDataSourceImpl extends ExchangeRateLocalDataSource {
-  Box get _box => Hive.box(kExchangeRatesCacheBox);
+  Box get _box => HiveStorage.box(HiveStorage.exchangeRatesCacheBox());
 
-  /// `null` (latest) and historical dates get distinct keys, matching the way
-  /// the remote data source chooses the latest vs. historical endpoint.
   String _keyFor(DateTime? dateTime) =>
       dateTime == null ? 'latest' : CommonFunctions.formatDate(dateTime);
 
