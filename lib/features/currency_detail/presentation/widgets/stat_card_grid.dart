@@ -29,8 +29,7 @@ class StatCardGrid extends StatelessWidget {
 
     final updatedLabel = args.lastUpdated == null
         ? '—'
-        : 
-              CommonFunctions.formatTime(args.lastUpdated!);
+        : CommonFunctions.formatShortDate(args.lastUpdated!);
 
     return GridView.count(
       shrinkWrap: true,

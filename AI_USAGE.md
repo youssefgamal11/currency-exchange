@@ -654,4 +654,54 @@ fix — it referenced a class that never existed in this app and failed on every
 
 </details>
 
+<details>
+<summary><strong>Documentation &amp; Final Polish</strong> (Entries 26–27)</summary>
+
+---
+
+## Entry 26 — 2026-07-22
+
+**Prompt:** After a re-check of the code against the assessment brief, asked to fix the one
+gap found — the currency-detail screen's "Last Update" stat card showed a clock time
+(`formatTime`) rather than a date, but the brief asks for *"the date of the last update."*
+
+**Model returned:** Re-read the brief module-by-module against the code, confirmed everything
+else was covered, and changed `StatCardGrid`'s `updatedLabel` from
+`CommonFunctions.formatTime(...)` to the already-existing `CommonFunctions.formatShortDate(...)`
+(e.g. `Jul 22`). Verified `formatShortDate` existed and ran `flutter analyze` on the file (clean).
+
+**Decision:** Accepted.
+
+**Why:** Small, literal-wording fix with a single correct implementation — the helper already
+existed, so this was reusing it rather than adding formatting logic. Flagged during the review
+as the only place the code diverged from the brief's exact wording.
+
+---
+
+## Entry 27 — 2026-07-22
+
+**Prompt:** Asked to create a `README.md` covering features (with short descriptions), the
+libraries used, the architecture, and the project structure, embedding four supplied
+screenshots (onboarding, exchange rates list, currency detail, loading).
+
+**Model returned:** Copied the four screenshots into `screenshots/` (renamed to
+underscore-safe filenames so GitHub Markdown resolves them), read the real `pubspec.yaml`
+dependencies and the actual `lib/` directory tree rather than inventing them, then wrote a
+full README: a screenshot table, a features list, a Clean-Architecture / feature-first
+overview, a grouped tech-stack table, an annotated folder tree, getting-started/testing
+commands, and the API reference with the EGP-inversion note.
+
+**Decision:** Accepted, with one deliberate call: the folder tree is written as the
+conventional `lib/core/` even though the directory on disk is literally named `core ` (with a
+trailing space) — the README documents intent, and the trailing-space folder is a known
+cleanup item, not something to enshrine in the docs.
+
+**Why:** Pulled the dependency list and structure straight from `pubspec.yaml` and `find lib`
+so the README describes what's actually there instead of a plausible-looking guess, and kept
+the screenshots inside the repo so they render on GitHub rather than linking to local paths.
+
+---
+
+</details>
+
 <!-- Add new sections/entries above this line as the project progresses. -->
