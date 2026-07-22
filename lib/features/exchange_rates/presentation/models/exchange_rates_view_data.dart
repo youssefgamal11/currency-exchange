@@ -20,7 +20,6 @@ const _currencyMeta = {
   'JPY': _CurrencyMeta('Japanese Yen', ImgPath.flagJpy),
 };
 
-
 class ExchangeRateViewData {
   const ExchangeRateViewData({
     required this.code,

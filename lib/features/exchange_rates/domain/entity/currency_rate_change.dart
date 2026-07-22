@@ -14,12 +14,11 @@ class CurrencyRateChange {
   });
 
   final String code;
-  final double rate; // EGP per 1 foreign unit
-  final double changeAbsolute; // EGP
+  final double rate;
+  final double changeAbsolute;
   final double changePercent;
   final RateTrend trend;
 
-  /// Builds from the raw EGP→foreign quotes (uninverted) for two days.
   factory CurrencyRateChange.fromQuotes({
     required String code,
     required double todayQuote,
@@ -47,8 +46,6 @@ class CurrencyRateChange {
     );
   }
 
-  /// Combines the "latest" and "previous" raw API responses into one change
-  /// per supported currency, skipping currencies missing from the latest data.
   static List<CurrencyRateChange> fromResponses({
     required ExchangeRateResponseEntity latest,
     required ExchangeRateResponseEntity previous,

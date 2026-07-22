@@ -19,5 +19,3 @@ class ConnectivityChangedEvent extends ExchangeRateEvents {
   @override
   List<Object?> get props => [isOnline];
 }
-
-

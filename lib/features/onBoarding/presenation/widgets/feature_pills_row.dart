@@ -23,7 +23,7 @@ class FeaturePillsRow extends StatelessWidget {
               ),
               child: Text(labels[index], style: AppTextStyle.m12),
             ),)
-  
+
     );
   }
 }

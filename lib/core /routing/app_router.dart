@@ -12,7 +12,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/service_locator.dart/service_locator.dart';
 import 'route_name.dart';
 
-
 class AppRouter {
   static Route<dynamic> allRoutes(RouteSettings settings) {
     switch (settings.name) {

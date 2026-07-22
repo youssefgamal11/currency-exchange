@@ -26,5 +26,4 @@ abstract class NetworkHelper {
     Function(int? count, int? total)? onReceiveProgress,
   });
 
-
 }

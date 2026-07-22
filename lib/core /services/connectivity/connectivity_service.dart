@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 
 abstract class ConnectivityService {
-  /// Emits `true` when the device is online, `false` when offline.
   Stream<bool> get onStatusChange;
 
   Future<bool> isConnected();

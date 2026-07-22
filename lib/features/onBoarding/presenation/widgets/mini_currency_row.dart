@@ -5,7 +5,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:axis/core%20/theme/colors.dart';
 import 'package:axis/core%20/theme/text_style.dart';
 
-
 class MiniCurrencyRow extends StatelessWidget {
   const MiniCurrencyRow({
     super.key,

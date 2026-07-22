@@ -24,14 +24,12 @@ class ExchangeRateRepositoryImpl extends ExchangeRateRepository {
   Future<Either<String, ExchangeRatesResult>> getExchangeRates(
     DateTime? dateTime,
   ) async {
-    // Offline: never fire the request, serve cache when available.
     if (!await connectivityService.isConnected()) {
       return _cachedOr(dateTime, 'No internet connection');
     }
 
     try {
       final response = await exchangeRateRemoteDataSource.getExchangeRates(dateTime);
-      // Write-through: persist the fresh response for offline use.
       await exchangeRateLocalDataSource.cacheExchangeRates(dateTime, response);
       return Right(
         ExchangeRatesResult(
@@ -41,7 +39,6 @@ class ExchangeRateRepositoryImpl extends ExchangeRateRepository {
         ),
       );
     } catch (e) {
-      // Read-through: fall back to cache when the network call fails.
       return _cachedOr(dateTime, ErrorHandler.handle(e).failure.message);
     }
   }

@@ -35,7 +35,6 @@ class CurrencyDetailPage extends StatelessWidget {
                 SizedBox(height: 16.h),
                 CurrencyHistoryChartCard(code: args.code),
                 SizedBox(height: 16.h),
-                // const InvertedRateInfoBanner(),
               ],
             ),
           ),

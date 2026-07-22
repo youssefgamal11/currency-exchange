@@ -81,7 +81,6 @@ class ExchangeRateBloc extends Bloc<ExchangeRateEvents, ExchangeRateStates> {
     }
     emit(state.copyWith(isOffline: !event.isOnline));
 
-    // Auto-refresh when connectivity returns.
     if (wasOffline && event.isOnline) {
       add(const GetExchangeRatesEvent());
     }

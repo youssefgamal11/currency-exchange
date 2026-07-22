@@ -16,7 +16,7 @@ class CurrencyDetailStates extends Equatable {
   });
 
   final BlocStatus status;
-  final List<CurrencyHistoryPoint> history; // oldest -> newest
+  final List<CurrencyHistoryPoint> history;
   final String? errorMessage;
   final bool isOffline;
 

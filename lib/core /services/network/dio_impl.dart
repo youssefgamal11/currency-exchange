@@ -28,7 +28,7 @@ class DioImpl implements NetworkHelper {
     _dio.options.connectTimeout = const Duration(seconds: _kConnectTimeout);
   }
 
-  Dio get dio => _dio; // Expose Dio instance if needed
+  Dio get dio => _dio;
 
   void _onSendProgress(int count, int total) {
     if (kDebugMode) {
@@ -76,7 +76,7 @@ class DioImpl implements NetworkHelper {
     Function(int? count, int? total)? onSendProgress,
     Function(int? count, int? total)? onReceiveProgress,
   }) async {
-  
+
     final response = await _dio.post(
       path,
       data: formData ?? body,
@@ -93,17 +93,13 @@ class DioImpl implements NetworkHelper {
     if (response.statusCode == 200 || response.statusCode == 201) {
       return response.data;
     } else {
-      // Handle bytes responses (like images) differently from JSON responses
       String errorMessage;
       if (response.data is List<int>) {
-        // For bytes responses, just use the status code
         errorMessage = 'Request failed with status: ${response.statusCode}';
       } else if (response.data is Map<String, dynamic>) {
-        // For JSON responses, try to get user_message
         errorMessage =
             response.data['user_message'] ?? response.statusCode.toString();
       } else {
-        // For other response types, use status code
         errorMessage = response.statusCode.toString();
       }
 

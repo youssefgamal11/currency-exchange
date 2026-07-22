@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// A tiny 2px-stroke line chart used decoratively wherever a rate trend
-/// needs a glance-sized visual (rate chips, preview rows).
 class MiniSparkline extends StatelessWidget {
   const MiniSparkline({
     super.key,
