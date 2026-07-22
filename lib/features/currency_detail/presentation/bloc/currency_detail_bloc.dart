@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:axis/core%20/enums/bloc_status.dart';
+import 'package:axis/core%20/services/connectivity/connectivity_service.dart';
 import '../../../exchange_rates/domain/entity/exchange_rates_response_entity.dart';
 import '../../../exchange_rates/domain/use_cases/get_exchange_rates_use_case.dart';
 import '../../domain/entity/currency_history_point.dart';
@@ -10,16 +13,29 @@ import 'currency_detail_states.dart';
 
 @injectable
 class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates> {
-  CurrencyDetailBloc(this.getExchangeRatesUseCase) : super(const CurrencyDetailStates()) {
+  CurrencyDetailBloc(this.getExchangeRatesUseCase, this.connectivityService)
+    : super(const CurrencyDetailStates()) {
     on<GetCurrencyHistoryEvent>(getCurrencyHistory);
+    on<ConnectivityChangedEvent>(_onConnectivityChanged);
+
+    _connectivitySub = connectivityService.onStatusChange.listen(
+      (isOnline) => add(ConnectivityChangedEvent(isOnline)),
+    );
+    connectivityService.isConnected().then(
+      (isOnline) => add(ConnectivityChangedEvent(isOnline)),
+    );
   }
 
   final GetExchangeRatesUseCase getExchangeRatesUseCase;
+  final ConnectivityService connectivityService;
+  StreamSubscription<bool>? _connectivitySub;
+  String? _lastCode;
 
   Future<void> getCurrencyHistory(
     GetCurrencyHistoryEvent event,
     Emitter<CurrencyDetailStates> emit,
   ) async {
+    _lastCode = event.code;
     emit(state.copyWith(status: BlocStatus.loading));
 
     final now = DateTime.now();
@@ -36,7 +52,7 @@ class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates
           error ??= e;
         },
         (response) {
-          responses.add(response);
+          responses.add(response.data);
         },
       );
       if (error != null) break;
@@ -57,5 +73,24 @@ class CurrencyDetailBloc extends Bloc<CurrencyDetailEvents, CurrencyDetailStates
     }
 
     emit(state.copyWith(status: BlocStatus.success, history: history));
+  }
+
+  void _onConnectivityChanged(
+    ConnectivityChangedEvent event,
+    Emitter<CurrencyDetailStates> emit,
+  ) {
+    final wasOffline = state.isOffline;
+    emit(state.copyWith(isOffline: !event.isOnline));
+
+    // Auto-refresh the history when connectivity returns.
+    if (wasOffline && event.isOnline && _lastCode != null) {
+      add(GetCurrencyHistoryEvent(code: _lastCode!));
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _connectivitySub?.cancel();
+    return super.close();
   }
 }

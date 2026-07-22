@@ -7,6 +7,7 @@ import '../args/currency_detail_args.dart';
 import '../widgets/currency_detail_header.dart';
 import '../widgets/currency_history_chart_card.dart';
 import '../widgets/current_rate_card.dart';
+import '../widgets/detail_offline_indicator.dart';
 import '../widgets/stat_card_grid.dart';
 
 class CurrencyDetailPage extends StatelessWidget {
@@ -26,6 +27,7 @@ class CurrencyDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CurrencyDetailHeader(code: args.code, name: args.name, flagAsset: args.flagAsset),
+                const DetailOfflineIndicator(),
                 SizedBox(height: 20.h),
                 CurrentRateCard(code: args.code, rate: args.rate),
                 SizedBox(height: 16.h),

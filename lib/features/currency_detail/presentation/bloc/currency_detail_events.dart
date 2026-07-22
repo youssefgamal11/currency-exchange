@@ -15,3 +15,12 @@ class GetCurrencyHistoryEvent extends CurrencyDetailEvents {
   @override
   List<Object?> get props => [code];
 }
+
+class ConnectivityChangedEvent extends CurrencyDetailEvents {
+  const ConnectivityChangedEvent(this.isOnline);
+
+  final bool isOnline;
+
+  @override
+  List<Object?> get props => [isOnline];
+}

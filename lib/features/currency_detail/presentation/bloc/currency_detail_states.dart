@@ -12,11 +12,13 @@ class CurrencyDetailStates extends Equatable {
     this.status = BlocStatus.initial,
     this.history = const [],
     this.errorMessage,
+    this.isOffline = false,
   });
 
   final BlocStatus status;
   final List<CurrencyHistoryPoint> history; // oldest -> newest
   final String? errorMessage;
+  final bool isOffline;
 
   double? get low => history.isEmpty ? null : history.map((p) => p.rate).reduce(min);
 
@@ -36,14 +38,16 @@ class CurrencyDetailStates extends Equatable {
     BlocStatus? status,
     List<CurrencyHistoryPoint>? history,
     String? errorMessage,
+    bool? isOffline,
   }) {
     return CurrencyDetailStates(
       status: status ?? this.status,
       history: history ?? this.history,
       errorMessage: errorMessage ?? this.errorMessage,
+      isOffline: isOffline ?? this.isOffline,
     );
   }
 
   @override
-  List<Object?> get props => [status, history, errorMessage];
+  List<Object?> get props => [status, history, errorMessage, isOffline];
 }

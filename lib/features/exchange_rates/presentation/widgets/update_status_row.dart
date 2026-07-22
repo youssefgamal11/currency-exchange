@@ -15,21 +15,28 @@ class UpdateStatusRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ExchangeRateBloc, ExchangeRateStates>(
-      buildWhen: (previous, current) => previous.lastUpdated != current.lastUpdated,
+      buildWhen: (previous, current) =>
+          previous.lastUpdated != current.lastUpdated ||
+          previous.isOffline != current.isOffline,
       builder: (context, state) {
         final updatedAt = state.lastUpdated != null
             ? CommonFunctions.formatTime(state.lastUpdated!)
             : '—';
+        final dotColor = state.isOffline ? AppColors.accent : AppColors.good;
+        final label = state.isOffline
+            ? 'Offline · Updated $updatedAt'
+            : 'Updated $updatedAt';
 
         return Row(
+          key: const ValueKey('update_status_row'),
           children: [
             Container(
               width: 7.w,
               height: 7.w,
-              decoration: const BoxDecoration(color: AppColors.good, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
             ),
             SizedBox(width: 6.w),
-            Text('Updated $updatedAt', style: AppTextStyle.m12),
+            Text(label, style: AppTextStyle.m12),
           ],
         );
       },

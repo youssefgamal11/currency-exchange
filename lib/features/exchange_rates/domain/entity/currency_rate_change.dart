@@ -4,10 +4,6 @@ enum RateTrend { strengthening, weakening, unchanged }
 
 const kSupportedCurrencyCodes = ['USD', 'EUR', 'GBP', 'SAR', 'JPY'];
 
-/// Domain value object holding the day-over-day change for a single currency.
-///
-/// Rates are expressed as EGP per 1 foreign unit (inverted from the raw
-/// EGP→foreign quotes the API returns). Pure logic — no presentation concerns.
 class CurrencyRateChange {
   const CurrencyRateChange({
     required this.code,
