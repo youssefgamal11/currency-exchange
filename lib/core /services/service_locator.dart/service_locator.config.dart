@@ -1,0 +1,84 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
+
+// **************************************************************************
+// InjectableConfigGenerator
+// **************************************************************************
+
+// ignore_for_file: type=lint
+// coverage:ignore-file
+
+// ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:get_it/get_it.dart' as _i174;
+import 'package:injectable/injectable.dart' as _i526;
+
+import '../../../features/currency_detail/data/data_source/currency_history_local_data_source.dart'
+    as _i654;
+import '../../../features/currency_detail/presentation/bloc/currency_detail_bloc.dart'
+    as _i525;
+import '../../../features/exchange_rates/data/data_source/exchange_rates_local_data_source.dart'
+    as _i921;
+import '../../../features/exchange_rates/data/data_source/exchange_rates_remote_data_source.dart'
+    as _i644;
+import '../../../features/exchange_rates/data/repository_impl/exchange_rates_repository_impl.dart'
+    as _i954;
+import '../../../features/exchange_rates/domain/repository/exchange_rates_repository.dart'
+    as _i502;
+import '../../../features/exchange_rates/domain/use_cases/get_exchange_rates_use_case.dart'
+    as _i12;
+import '../../../features/exchange_rates/presentation/bloc/exchange_rates_bloc.dart'
+    as _i383;
+import '../connectivity/connectivity_service.dart' as _i528;
+import '../network/dio_impl.dart' as _i856;
+import '../network/network_helper.dart' as _i369;
+
+extension GetItInjectableX on _i174.GetIt {
+  // initializes the registration of main-scope dependencies inside of GetIt
+  _i174.GetIt init({
+    String? environment,
+    _i526.EnvironmentFilter? environmentFilter,
+  }) {
+    final gh = _i526.GetItHelper(this, environment, environmentFilter);
+    gh.lazySingleton<_i528.ConnectivityService>(
+      () => _i528.ConnectivityServiceImpl(),
+    );
+    gh.factory<_i921.ExchangeRateLocalDataSource>(
+      () => _i921.ExchangeRateLocalDataSourceImpl(),
+    );
+    gh.lazySingleton<_i369.NetworkHelper>(() => _i856.DioImpl());
+    gh.factory<_i654.CurrencyHistoryLocalDataSource>(
+      () => _i654.CurrencyHistoryLocalDataSourceImpl(),
+    );
+    gh.factory<_i644.ExchangeRateRemoteDataSource>(
+      () => _i644.ExchangeRateRemoteDataSourceImpl(
+        networkHelper: gh<_i369.NetworkHelper>(),
+      ),
+    );
+    gh.factory<_i502.ExchangeRateRepository>(
+      () => _i954.ExchangeRateRepositoryImpl(
+        exchangeRateRemoteDataSource: gh<_i644.ExchangeRateRemoteDataSource>(),
+        exchangeRateLocalDataSource: gh<_i921.ExchangeRateLocalDataSource>(),
+        connectivityService: gh<_i528.ConnectivityService>(),
+      ),
+    );
+    gh.factory<_i12.GetExchangeRatesUseCase>(
+      () => _i12.GetExchangeRatesUseCase(
+        exchangeRateRepository: gh<_i502.ExchangeRateRepository>(),
+      ),
+    );
+    gh.factory<_i525.CurrencyDetailBloc>(
+      () => _i525.CurrencyDetailBloc(
+        gh<_i12.GetExchangeRatesUseCase>(),
+        gh<_i528.ConnectivityService>(),
+        gh<_i654.CurrencyHistoryLocalDataSource>(),
+      ),
+    );
+    gh.factory<_i383.ExchangeRateBloc>(
+      () => _i383.ExchangeRateBloc(
+        gh<_i12.GetExchangeRatesUseCase>(),
+        gh<_i528.ConnectivityService>(),
+      ),
+    );
+    return this;
+  }
+}
