@@ -537,4 +537,121 @@ consolidation instinct applied to the view-data/domain math in Entry 12.
 
 </details>
 
+<details>
+<summary><strong>Testing</strong> (Entries 22–25)</summary>
+
+---
+
+## Entry 22 — 2026-07-22
+
+
+
+**Prompt (reconstructed):** Asked Claude to plan a meaningful test plan (bloc test and unit test) for the two 
+features before writing any tests — pick the tooling, lay out a `test/` structure mirroring
+`lib/`, and surface the project-specific traps up front. Same spec-before-code discipline as
+the feature modules.
+
+**Model returned:** Wrote `testing.md` — a full plan choosing `mocktail` + `bloc_test` (no
+codegen), a `test/` tree mirroring `lib/` with a `helpers/` folder (mocks, fixtures, Hive
+setup, widget harness), a prioritized order (pure units → data layer → blocs → widgets), and a
+"Gotchas — read before writing any test" section documenting five real traps found in the
+codebase: the trailing-space `core ` directory forcing `core%20/` imports, both blocs eagerly
+subscribing to connectivity in their constructors, `GetExchangeRatesUseCase` being a callable
+class, the 2-vs-7 use-case call counts per bloc event, and `RateTrend` semantics being inverted
+relative to the raw quote.
+
+**Decision:** Accepted.
+
+**Why:** Chose `mocktail` over `mockito` deliberately — `mockito` needs `build_runner`
+codegen, and this repo's build_runner pipeline doesn't work (the same constraint that shaped
+the hand-maintained DI and the JSON-envelope cache in Entry 19). Writing the gotchas down first
+turned hours of likely debugging into a checklist, matching the project's spec-before-code
+habit (Entries 3, 11, 15).
+
+---
+
+## Entry 23 — 2026-07-22
+
+**Prompt (reconstructed):** Asked Claude to build the shared helpers and the pure-logic unit
+tests first — the currency math, view-model mapping, state getters, and formatters — since
+that's the highest-risk, fully-deterministic code.
+
+**Model returned:** `helpers/mocks.dart` (one `Mock` per collaborator plus a `stubConnectivity`
+helper and a `registerFallbackValue(DateTime(2020))` for the nullable `DateTime?` positional),
+`helpers/fixtures.dart` (a `buildResponse`/`buildResult` builder keeping quotes in **raw
+EGP-per-unit form** so the `1/quote` inversion under test matches production), then the pure
+suites: `currency_rate_change_test.dart` (rate inversion, null/zero-yesterday fallback to
+`unchanged`, the strengthening/weakening direction, percent-change and the
+`previousRate == 0` guard), `exchange_rates_view_data_test.dart` (meta/color/label/trendIcon
+mapping), `currency_detail_states_test.dart` (empty/single/ascending/descending `weekTrend` and
+`range` getters), and `common_functions_test.dart` (date/time/short-date formatters incl.
+midnight/noon edge cases).
+
+**Decision:** Accepted.
+
+**Why:** Front-loaded the pure units because they need no mocks, run fast, and cover the
+riskiest logic — the rate inversion and inverted trend direction that Entry 11 flagged as the
+easiest thing to get silently wrong. Keeping fixture quotes in raw (un-inverted) form is the
+detail that keeps those tests honest rather than tautological.
+
+---
+
+## Entry 24 — 2026-07-22
+
+**Prompt (reconstructed):** Asked Claude to cover the data layer and both Blocs — repository
+branch coverage, the use case, the Hive-backed local sources, and full state-transition tests
+with `bloc_test`.
+
+**Model returned:** `exchange_rates_repository_impl_test.dart` (all four branches:
+offline+cache, offline+no-cache, online-success with write-through `verify`, online-throw
+falling back to cache — using `verifyNever(() => remote.getExchangeRates(any()))` to prove the
+offline guard never touches the network), `get_exchange_rates_use_case_test.dart` (pass-through
+delegation), `exchange_rates_response_model_test.dart` (JSON round-trip, missing-field
+defaults), the two local-data-source suites run against a **temporary real Hive box** (round-
+trip, unknown-key `null`, corrupt-value `catch` path), and the bloc suites
+(`exchange_rate_bloc_test.dart`, `currency_detail_bloc_test.dart`) covering success, failure,
+going offline, offline→online auto-refresh, cached fallback, and no-caching-while-offline.
+
+**Decision:** Accepted, with two non-obvious testing calls baked in. (1) The local sources use
+**static `HiveStorage` boxes**, not injected dependencies, so they can't be mocked — tested
+against a real temp box instead. (2) Because both blocs eagerly call `isConnected().then(...)`
+in their constructors, `isConnected()` is stubbed to return a **future that never completes**,
+and connectivity is driven explicitly via dispatched `ConnectivityChangedEvent`s.
+
+**Why:** The never-completing-future stub came from a real failure: a resolving
+`isConnected()` future landed *after* the `act` event, flipped `wasOffline`, and triggered an
+unwanted auto-refresh into an unstubbed use case — a flaky race that only surfaced by running
+the suite. Documenting it in `testing.md`'s gotchas (Entry 22) and encoding it in
+`stubConnectivity` stops every future bloc test from re-hitting it.
+
+---
+
+## Entry 25 — 2026-07-22
+
+**Prompt (reconstructed):** Asked Claude to add widget tests for the presentation layer and
+delete the stale default Flutter counter template that was failing.
+
+**Model returned:** `helpers/widget_harness.dart` — a `pumpWithHarness` that wraps a widget in
+`ScreenUtilInit` (390×844 design size, so `.w`/`.h`/`.sp`/`.r` resolve), a `MaterialApp`/
+`Scaffold`, and a `DefaultAssetBundle` backed by a `FakeAssetBundle` returning a minimal valid
+SVG so `SvgPicture.asset` flag widgets render without shipping real assets into the test
+bundle. Then leaf-widget tests (`exchange_rate_leaf_widgets_test.dart`,
+`currency_detail_widgets_test.dart`: header/refresh tap, error+retry, empty, shimmer loading,
+rate/stat cards) and bloc-driven tests (`exchange_rates_list_body_test.dart`,
+`update_status_row_test.dart`) using `MockBloc` seeded via `whenListen(...)` and provided with
+`BlocProvider.value` — one test per `BlocStatus`, plus verifying a `Retry` tap re-dispatches
+`GetExchangeRatesEvent`. Deleted `test/widget_test.dart` (the counter template referencing a
+non-existent `MyApp`).
+
+**Decision:** Accepted — 73 tests passing via `flutter test`.
+
+**Why:** The `FakeAssetBundle` is what makes widget tests viable at all here: the flag SVGs are
+real bundled assets, and without a fake bundle every `SvgPicture.asset` throws in the test
+environment. Deleting the stale counter template (rather than leaving it red) was a correctness
+fix — it referenced a class that never existed in this app and failed on every run.
+
+---
+
+</details>
+
 <!-- Add new sections/entries above this line as the project progresses. -->
